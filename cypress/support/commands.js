@@ -25,10 +25,28 @@ Cypress.Commands.add('putRequest', (url, body) => {
 });
 
 Cypress.Commands.add('deleteRequest', (url) => {
-    cy
-      .request({
-        method: 'DELETE',
-        url: url
-    });
-});
+  const maxRetries = 5;
+  const delayMs = 1000;
 
+  const deleteRequestInternal = (url, attempt) => {
+    return cy.request({
+      method: 'DELETE',
+      url: url,
+      failOnStatusCode: false  
+    })
+     .then((response) => {
+        if (response.status === 200) {
+          return response;
+        } else {
+          if (attempt < maxRetries) {
+            cy.wait(delayMs);
+            return deleteRequestInternal(url, attempt + 1);
+          } else {
+            return response;
+          }
+        }
+      });
+  };
+
+  return deleteRequestInternal(url, 1);
+});
