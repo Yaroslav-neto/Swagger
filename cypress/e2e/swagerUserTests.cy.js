@@ -25,6 +25,7 @@ describe('actions with the user', () => {
         expect(response.body.type).eq("unknown")
         expect(response.body.message).eq(newUser.username);
       });
+    cy.wait(15000)
   });
 
   it('should create user', () => {
@@ -85,9 +86,9 @@ it('should delete user', () => {
           expect(response.body.code).eq(200)
           expect(response.body.type).eq("unknown")
           expect(response.body.message).eq(newUser.username);
-        })
-        
+        }).then(() => {
           cy.wait(10000);
+
           cy
             .getRequest(url + '/' + newUser.username, {failOnStatusCode: false})
               .then((response) => {
@@ -96,6 +97,9 @@ it('should delete user', () => {
                 expect(response.body.type).eq('error')
                 expect(response.body.message).eq('User not found');
               });
+        })
+        
+          
         
 
     
